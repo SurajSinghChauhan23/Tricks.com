@@ -1,0 +1,32 @@
+pipeline {
+
+    agent any
+
+    options{
+        disableConcurrentBuilds()
+    }
+
+    triggers {
+        cron('H/5 * * * *')
+    }
+
+    stages {
+
+        stage('Check Pending Posts') {
+            steps {
+                
+                    sh '''
+                    curl http://10.182.191.100:8000/api/check_pending
+                    '''
+            }
+        }
+
+        stage('Trigger ML Pipeline') {
+            steps {
+                sh '''
+                curl -X POST http://10.182.191.100:8000/api/retrain_pipeline
+                '''
+            }
+        }
+    }
+}
